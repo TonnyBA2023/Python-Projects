@@ -1,0 +1,36 @@
+from datetime import datetime
+
+
+class Task:
+
+    def __init__(self, title, deadline):
+        self.title = title
+        self.deadline = deadline
+        self.completed = False
+
+    def mark_complete(self):
+        self.completed = True
+
+
+class TaskManager:
+
+    def __init__(self):
+        self.tasks = []
+
+    def add_task(self, title, deadline):
+        self.tasks.append(Task(title, deadline))
+
+    def complete_task(self, index):
+        self.tasks[index].mark_complete()
+
+    def display_tasks(self):
+
+        print("\nTASK LIST")
+
+        for i, task in enumerate(self.tasks, start=1):
+            status = "Done" if task.completed else "Pending"
+
+            print(
+                f"{i}. {task.title} | "
+                f"{task.deadline} | {status}"
+            )

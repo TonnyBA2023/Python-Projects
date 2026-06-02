@@ -1,0 +1,20 @@
+class Employee:
+    def __init__(self, employee_id, name, salary):
+        self.employee_id = employee_id
+        self.name = name
+        self.salary = salary
+
+    def calculate_tax(self):
+        return self.salary * 0.15
+
+    def calculate_net_salary(self):
+        return self.salary - self.calculate_tax()
+
+    def generate_payslip(self):
+        print("\nPAYSLIP")
+        print("-" * 40)
+        print(f"Employee ID: {self.employee_id}")
+        print(f"Name: {self.name}")
+        print(f"Gross Salary: {self.salary}")
+        print(f"Tax: {self.calculate_tax()}")
+        print(f"Net Salary: {self.calculate_net_salary()}")

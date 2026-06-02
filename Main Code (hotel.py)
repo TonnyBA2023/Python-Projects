@@ -1,0 +1,315 @@
+from datetime import datetime
+
+
+class Guest:
+    def __init__(self, guest_id, name, phone):
+        self.guest_id = guest_id
+        self.name = name
+        self.phone = phone
+
+
+class Room:
+    def __init__(self, room_number, room_type, price):
+        self.room_number = room_number
+        self.room_type = room_type
+        self.price = price
+        self.available = True
+
+
+class Reservation:
+    def __init__(
+        self,
+        reservation_id,
+        guest,
+        room,
+        check_in,
+        check_out
+    ):
+        self.reservation_id = reservation_id
+        self.guest = guest
+        self.room = room
+        self.check_in = check_in
+        self.check_out = check_out
+
+    def calculate_bill(self):
+        check_in = datetime.strptime(
+            self.check_in,
+            "%Y-%m-%d"
+        )
+
+        check_out = datetime.strptime(
+            self.check_out,
+            "%Y-%m-%d"
+        )
+
+        nights = (check_out - check_in).days
+
+        return nights * self.room.price
+
+
+class Hotel:
+
+    def __init__(self):
+        self.rooms = []
+        self.guests = []
+        self.reservations = []
+
+    def add_room(
+        self,
+        room_number,
+        room_type,
+        price
+    ):
+        room = Room(
+            room_number,
+            room_type,
+            price
+        )
+
+        self.rooms.append(room)
+
+    def register_guest(
+        self,
+        name,
+        phone
+    ):
+        guest_id = len(self.guests) + 1
+
+        guest = Guest(
+            guest_id,
+            name,
+            phone
+        )
+
+        self.guests.append(guest)
+
+        return guest
+
+    def find_available_room(
+        self,
+        room_type
+    ):
+        for room in self.rooms:
+
+            if (
+                room.room_type.lower()
+                == room_type.lower()
+                and room.available
+            ):
+                return room
+
+        return None
+
+    def create_reservation(
+        self,
+        guest,
+        room_type,
+        check_in,
+        check_out
+    ):
+
+        room = self.find_available_room(
+            room_type
+        )
+
+        if room is None:
+            print(
+                "No available room found."
+            )
+            return
+
+        reservation_id = (
+            len(self.reservations) + 1
+        )
+
+        reservation = Reservation(
+            reservation_id,
+            guest,
+            room,
+            check_in,
+            check_out
+        )
+
+        room.available = False
+
+        self.reservations.append(
+            reservation
+        )
+
+        print(
+            f"Reservation created. "
+            f"ID: {reservation_id}"
+        )
+
+    def checkout(
+        self,
+        reservation_id
+    ):
+
+        for reservation in self.reservations:
+
+            if (
+                reservation.reservation_id
+                == reservation_id
+            ):
+
+                reservation.room.available = True
+
+                bill = (
+                    reservation.calculate_bill()
+                )
+
+                print(
+                    f"Total Bill: ${bill}"
+                )
+
+                return
+
+        print("Reservation not found.")
+
+    def display_rooms(self):
+
+        print("\nROOMS")
+        print("-" * 50)
+
+        for room in self.rooms:
+
+            status = (
+                "Available"
+                if room.available
+                else "Occupied"
+            )
+
+            print(
+                f"Room {room.room_number} | "
+                f"{room.room_type} | "
+                f"${room.price} | "
+                f"{status}"
+            )
+
+    def hotel_report(self):
+
+        print("\nHOTEL REPORT")
+        print("=" * 50)
+
+        print(
+            f"Total Rooms: "
+            f"{len(self.rooms)}"
+        )
+
+        print(
+            f"Total Guests: "
+            f"{len(self.guests)}"
+        )
+
+        print(
+            f"Reservations: "
+            f"{len(self.reservations)}"
+        )
+
+
+def main():
+
+    hotel = Hotel()
+
+    hotel.add_room(101, "Single", 50)
+    hotel.add_room(102, "Single", 50)
+    hotel.add_room(201, "Double", 90)
+    hotel.add_room(301, "Suite", 200)
+
+    while True:
+
+        print("\nHOTEL SYSTEM")
+        print("1. Register Guest")
+        print("2. Book Room")
+        print("3. View Rooms")
+        print("4. Checkout")
+        print("5. Report")
+        print("6. Exit")
+
+        choice = input(
+            "Select option: "
+        )
+
+        if choice == "1":
+
+            name = input("Name: ")
+            phone = input("Phone: ")
+
+            hotel.register_guest(
+                name,
+                phone
+            )
+
+            print(
+                "Guest registered."
+            )
+
+        elif choice == "2":
+
+            guest_id = int(
+                input("Guest ID: ")
+            )
+
+            room_type = input(
+                "Room Type: "
+            )
+
+            check_in = input(
+                "Check-In (YYYY-MM-DD): "
+            )
+
+            check_out = input(
+                "Check-Out (YYYY-MM-DD): "
+            )
+
+            guest = None
+
+            for g in hotel.guests:
+                if g.guest_id == guest_id:
+                    guest = g
+
+            if guest:
+
+                hotel.create_reservation(
+                    guest,
+                    room_type,
+                    check_in,
+                    check_out
+                )
+
+            else:
+                print("Guest not found.")
+
+        elif choice == "3":
+
+            hotel.display_rooms()
+
+        elif choice == "4":
+
+            reservation_id = int(
+                input(
+                    "Reservation ID: "
+                )
+            )
+
+            hotel.checkout(
+                reservation_id
+            )
+
+        elif choice == "5":
+
+            hotel.hotel_report()
+
+        elif choice == "6":
+
+            print("Goodbye.")
+            break
+
+        else:
+
+            print("Invalid option.")
+
+
+if __name__ == "__main__":
+    main()
